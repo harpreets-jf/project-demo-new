@@ -1,0 +1,51 @@
+name: "Bank-Payments-API-Production"
+
+on:
+  workflow_dispatch: # Manual trigger for your demo
+
+permissions:
+  id-token: write # Required for OIDC
+  contents: read  # Required for checkout
+
+jobs:
+  deploy:
+    runs-on: ubuntu-latest
+    environment: production # Triggers the "production" claim for JFrog
+    
+    steps:
+      - name: Checkout Code
+        uses: actions/checkout@v4
+
+      - name: Setup JFrog CLI
+        uses: jfrog/setup-jfrog-cli@v4
+        env:
+          JF_URL: https://${{ vars.JF_URL }}/
+        with:
+          oidc-provider-name: hs-gh # Must match JFrog Provider Name
+
+      - name: JFrog Audit (SCA Scan)
+        run: |
+          # Scans source code for vulnerabilities before building
+          jf audit --fail=false 
+
+      - name: Docker Build & Push
+        run: |
+          # 1. Build (ensure you have a Dockerfile in your repo)
+          docker build -t hs2-hs-new-docker.jfrog.io/bank-app:${{ github.run_number }} .
+          
+          # 2. Push image & link to build-info
+          jf docker push hs2-hs-new-docker.jfrog.io/bank-app:${{ github.run_number }} \
+            --build-name="bank-payments-api" \
+            --build-number="${{ github.run_number }}"
+
+      - name: Publish Build Info
+        run: |
+          # Collects env vars and git metadata for the audit trail (SBOM)
+          jf rt build-collect-env "bank-payments-api" "${{ github.run_number }}"
+          jf rt build-add-git "bank-payments-api" "${{ github.run_number }}"
+          jf rt build-publish "bank-payments-api" "${{ github.run_number }}"
+
+      - name: Xray Build Scan
+        run: |
+          # Final security gate: Scans the published build in Artifactory
+          jf build-scan "bank-payments-api" "${{ github.run_number }}"
