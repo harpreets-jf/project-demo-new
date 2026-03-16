@@ -11,7 +11,7 @@ RUN echo "Banking API v1.0 - High Performance Config" > /opt/optimized_app.conf
 # STAGE 2: Production Stage (Clean Base Image)
 # This is the final image that gets pushed to Artifactory. We use the latest,
 # minimal Alpine image to keep it lean.
-FROM alpine:latest
+FROM alpine:3.23.0
 
 # Copy the artifact generated in the vulnerable stage.
 # This is the key: even though this final image is 'clean', Xray will trace
