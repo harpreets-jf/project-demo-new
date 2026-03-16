@@ -1,0 +1,6 @@
+- params:
+    scan:
+      # This tells Frogbot to scan the root of your repo
+      projects:
+        - workingDirs:
+            - .
