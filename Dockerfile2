@@ -1,0 +1,16 @@
+# Using an older Node.js version that has its own security issues
+FROM node:14-slim
+
+# Create app directory
+WORKDIR /usr/src/app
+
+# 1. Initialize a dummy node project
+# 2. Install lodash version 4.17.15 (This has a known CRITICAL vulnerability)
+RUN npm init -y && \
+    npm install lodash@4.17.15
+
+# Copy your source code (if any)
+COPY . .
+
+# Just a placeholder command
+CMD [ "node" ]
