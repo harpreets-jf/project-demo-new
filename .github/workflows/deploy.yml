@@ -51,4 +51,3 @@ jobs:
         run: |
           # Final security gate: Scans the published build in Artifactory
           jf build-scan "bank-payments-api" "${{ github.run_number }}"
-          jf scan --sbom=true
