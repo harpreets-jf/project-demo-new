@@ -23,32 +23,24 @@ jobs:
         with:
           oidc-provider-name: hs-gh # Must match JFrog Provider Name
 
-      - name: Docker Build & Push
+      - name: Verify Connection
         run: |
-          # The domain itself points to the 'hs-dock-demo-docker' repo
-          REGISTRY="hts2-hs-dock-demo-docker.jfrog.io"
-          IMAGE_NAME="bank-app"
-          IMAGE_URL="$REGISTRY/$IMAGE_NAME:${{ github.run_number }}"
+          echo "Testing connection..."
+          jf rt ping
           
-          echo "Building and Pushing to: $IMAGE_URL"
-
-          # 1. Build
-          docker build -t $IMAGE_URL .
+      - name: Verify User Identity
+        run: |
+          echo "Checking who I am authenticated as..."
+          jf rt curl -XGET /api/security/users/current
           
-          # 2. Push (JFrog CLI will handle the login to the subdomain automatically)
-          jf docker push $IMAGE_URL \
-            --build-name="bank-payments-api" \
-            --build-number="${{ github.run_number }}"
-
-      - name: Publish Build Info
+      - name: Test Repository Access
         run: |
-          # Collects env vars and git metadata for the audit trail (SBOM)
-          jf rt build-collect-env "bank-payments-api" "${{ github.run_number }}"
-          jf rt build-add-git "bank-payments-api" "${{ github.run_number }}"
-          jf rt build-publish "bank-payments-api" "${{ github.run_number }}"
-
-      - name: Xray Build Scan
+          echo "Testing access to project repositories..."
+          # Replace with a repository in your project
+          jf rt curl -XGET /api/repositories/hs-dock-demo-docker-local/
+          
+      - name: Upload Test Artifact
         run: |
-          # Final security gate: Scans the published build in Artifactory
-          jf build-scan "bank-payments-api" "${{ github.run_number }}"
-          jf audit --sbom=true
+          echo "test content" > test-artifact.txt
+          # Replace with your project's repository
+          jf rt upload test-artifact.txt hs-dock-demo-docker-local/test/
