@@ -29,6 +29,6 @@ jobs:
           echo "test content" > test-artifact.txt
           # Replace with your project's repository
           jf docker pull hts2-hs-dock-demo-docker.jfrog.io/memcached:bookworm
-          jf docker scan hts2-hs-dock-demo-docker.jfrog.io/memcached:bookworm
+          jf audit
           jf docker push hts2-hs-dock-demo-docker.jfrog.io/memcached:bookworm
           jf rt bp hs-oidc 1
