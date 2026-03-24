@@ -38,16 +38,12 @@ jobs:
           jf docker push $IMAGE_URL \
             --build-name="bank-payments-api" \
             --build-number="${{ github.run_number }}"
-    #      jf audit  
+    
             
-   #   - name: Publish Build Info
-    #    run: |
+      - name: Publish and Scam Build Info
+        run: |
           # Collects env vars and git metadata for the audit trail (SBOM)
-     #     jf rt build-collect-env "bank-payments-api" "${{ github.run_number }}"
-      #    jf rt build-add-git "bank-payments-api" "${{ github.run_number }}"
-       #   jf rt build-publish "bank-payments-api" "${{ github.run_number }}"
+     
+          jf rt build-publish "bank-payments-api" "${{ github.run_number }}"
           
- #     - name: Xray Build Scan
- #       run: |
-          # Final security gate: Scans the published build in Artifactory
-  #        jf build-scan "bank-payments-api" "${{ github.run_number }}"
+          jf build-scan "bank-payments-api" "${{ github.run_number }}"
