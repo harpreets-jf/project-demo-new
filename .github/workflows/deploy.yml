@@ -10,7 +10,7 @@ permissions:
 jobs:
   deploy:
     runs-on: ubuntu-latest
-    environment: production # Triggers the "production" claim for JFrog
+    # environment: production # Triggers the "production" claim for JFrog
     
     steps:
       - name: Checkout Code
