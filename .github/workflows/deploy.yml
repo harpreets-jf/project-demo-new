@@ -31,7 +31,7 @@ jobs:
           # Collects env vars and git metadata for the audit trail (SBOM)
      
           jf docker pull hts2-hs-dock-demo-docker.jfrog.io/alpine:latest --build-name="bank-payments-api" --build-number=${{ github.run_number }}
-          jf build-scan "bank-payments-api" "${{ github.run_number }}"
+          #jf build-scan "bank-payments-api" "${{ github.run_number }}"
           #jf rt build-publish "bank-payments-api" "${{ github.run_number }}"
           
           
