@@ -30,4 +30,4 @@ jobs:
           # Replace with your project's repository
           jf docker pull hts2-hs-dock-demo-docker.jfrog.io/memcached:bookworm
           jf docker push hts2-hs-dock-demo-docker.jfrog.io/memcached:bookworm
-        # jf docker scan hts2-hs-dock-demo-docker.jfrog.io/memcached:bookworm --sca --without-contextual-analysis
+          jf docker scan hts2-hs-dock-demo-docker.jfrog.io/memcached:bookworm --sca --without-contextual-analysis=true
