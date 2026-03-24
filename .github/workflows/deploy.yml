@@ -10,7 +10,7 @@ permissions:
 jobs:
   deploy:
     runs-on: ubuntu-latest
-    environment: production #Triggers the "production" claim for JFrog
+    environment: production # Triggers the "production" claim for JFrog
     
     steps:
       - name: Checkout Code
@@ -22,12 +22,31 @@ jobs:
           JF_URL: https://${{ vars.JF_URL }}/
         with:
           oidc-provider-name: hs-gh # Must match JFrog Provider Name
-          
-          
-      - name: Upload Test Artifact
+
+      - name: Docker Build & Push
         run: |
+          # The domain itself points to the 'hs-dock-demo-docker' repo
+          REGISTRY="hts2-hs-dock-demo-docker.jfrog.io"
+          IMAGE_NAME="bank-app"
+          IMAGE_URL="$REGISTRY/$IMAGE_NAME:${{ github.run_number }}"
           
-          # Replace with your project's repository
-          jf docker pull hts2-hs-dock-demo-docker.jfrog.io/memcached:bookworm
-          jf docker push hts2-hs-dock-demo-docker.jfrog.io/memcached:bookworm
-          jf docker scan hts2-hs-dock-demo-docker.jfrog.io/memcached:bookworm --sca --without-contextual-analysis=true
+          echo "Building and Pushing to: $IMAGE_URL"
+          # 1. Build
+          docker build -t $IMAGE_URL .
+          
+          # 2. Push (JFrog CLI will handle the login to the subdomain automatically)
+          jf docker push $IMAGE_URL \
+            --build-name="bank-payments-api" \
+            --build-number="${{ github.run_number }}"
+            
+      - name: Publish Build Info
+        run: |
+          # Collects env vars and git metadata for the audit trail (SBOM)
+          jf rt build-collect-env "bank-payments-api" "${{ github.run_number }}"
+          jf rt build-add-git "bank-payments-api" "${{ github.run_number }}"
+          jf rt build-publish "bank-payments-api" "${{ github.run_number }}"
+          
+      - name: Xray Build Scan
+        run: |
+          # Final security gate: Scans the published build in Artifactory
+          jf build-scan "bank-payments-api" "${{ github.run_number }}"
