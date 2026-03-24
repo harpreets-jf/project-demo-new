@@ -38,7 +38,7 @@ jobs:
           jf docker push $IMAGE_URL \
             --build-name="bank-payments-api" \
             --build-number="${{ github.run_number }}"
-          jf audit  
+    #      jf audit  
             
    #   - name: Publish Build Info
     #    run: |
